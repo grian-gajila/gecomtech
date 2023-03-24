@@ -10,8 +10,6 @@
 <img src="images/first.jpg">
 
 #
-* If you want to show my profile click the profile text below the start button in front page of the game
-<img src="images/profile.jpg">
 
 * If you want the code of this app click the SourseCode in upper page and copy/download the whole code
 
