@@ -91,10 +91,10 @@
 		var height = window.innerHeight;
 		window.requestAnimationFrame = (function() {
 			return window.requestAnimationFrame ||
-				window.webkitRequestAnimationFrame ||
-				window.mozRequestAnimationFrame ||
-				window.oRequestAnimationFrame ||
-				window.msRequestAnimationFrame ||
+				window.requestAnimationFrame ||
+				window.requestAnimationFrame ||
+				window.requestAnimationFrame ||
+				window.requestAnimationFrame ||
 				function (callback) {
 					return window.setTimeout(callback, confetti.frameInterval);
 				};
