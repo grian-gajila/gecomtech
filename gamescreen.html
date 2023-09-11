@@ -1,73 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>CpE Dev</title>
-        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@700&display=swap" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500&display=swap" rel="stylesheet">
-        <link rel="icon" href="images/iconlogo.jpg">
-        <link rel="stylesheet" href="css/index.css">
-        <link rel="stylesheet" href="css/screen.css">
-       
-    </head>
-    <body class="gamescreen-body">
-        <header class="header">
-            <a class="active" href="selection.html">Back to Selection   <img class="handarrow" src="images/handarrow.png"></a>
-        </header>
-        <div class="gamescreen-wrapper" id="wrapper">
-            <p>
-                <img src="images/title.png" class="gamescreen-logo">
-            </p>
-            <div id="counter">
-                <div id="counterSpan"></div>
-            </div>
-            <div class="question" id="question">
-                <span class="span">Question goes here?</span>
-            </div>
-            
-            <span class="result off" id="result">
-                <span>You're answers Wrong!</span>
-            </span>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>CpE Dev</title>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@700&display=swap"
+			rel="stylesheet"
+		/>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="icon" href="images/CpeDev.png" />
+		<link rel="stylesheet" href="css/index.css" />
+		<link rel="stylesheet" href="css/screen.css" />
+	</head>
+	<body class="gamescreen-body">
+		<header class="header">
+			<a class="active" href="selection.html"
+				>Back to Selection <img class="handarrow" src="images/handarrow.png"
+			/></a>
+		</header>
+		<div class="gamescreen-wrapper" id="wrapper">
+			<p>
+				<img src="images/title.png" class="gamescreen-logo" />
+			</p>
+			<div id="counter">
+				<div id="counterSpan"></div>
+			</div>
+			<div class="question" id="question">
+				<span class="span">Question goes here?</span>
+			</div>
 
-            <div class="answers" id="answers">
+			<span class="result off" id="result">
+				<span>You're answers Wrong!</span>
+			</span>
 
-                <p class="first-p"><button type="button" class="btn answer" id="btn">Answer 1</button></p>
-                <p><button type="button" class="btn answer" id="btn">Answer 2</button></p>
-                <p><button type="button" class="btn answer" id="btn">Answer 3</button></p>
-                <p><button type="button" class="btn answer" id="btn">Answer 4</button></p>
+			<div class="answers" id="answers">
+				<p class="first-p">
+					<button type="button" class="btn answer" id="btn">Answer 1</button>
+				</p>
+				<p>
+					<button type="button" class="btn answer" id="btn">Answer 2</button>
+				</p>
+				<p>
+					<button type="button" class="btn answer" id="btn">Answer 3</button>
+				</p>
+				<p>
+					<button type="button" class="btn answer" id="btn">Answer 4</button>
+				</p>
+			</div>
 
-            </div>
-            
-            <div class="submit" id="submit">
-                <button type="button" class="btn-submit" id="btnSubmit">CHECK</button>
-            </div>
-            
-            
-            <div class="next" id="next">
-                <p><button type="button" class="btn-next" id="btnNext">NEXT</button></p>
-            </div>
-            <section class="copyright">
-                <p > <a href="https://github.com/g-r-i-a-n"> &#169; gri@n02 </a></p>
-            </section>
-        </div>
+			<div class="submit" id="submit">
+				<button type="button" class="btn-submit" id="btnSubmit">CHECK</button>
+			</div>
 
-        <audio  id="music">
-            <source src="sfx/long-Oman.mp3" type="audio/mp3">
-        </audio>
-        <audio  id="click">
-            <source src="sfx/click.ogg" type="audio/mp3">
-        </audio>
-        <audio  id="applause">
-            <source src="sfx/applause.mp3" type="audio/mp3">
-        </audio>
-        <audio  id="boos">
-            <source src="sfx/crowdboo.mp3" type="audio/mp3">
-        </audio>
-    <script src="js/question.js"></script>
-    </body>
+			<div class="next" id="next">
+				<p><button type="button" class="btn-next" id="btnNext">NEXT</button></p>
+			</div>
+			<section class="copyright">
+				<p><a href="https://github.com/g-r-i-a-n"> &#169; gri@n02 </a></p>
+			</section>
+		</div>
+
+		<audio id="music">
+			<source src="sfx/long-Oman.mp3" type="audio/mp3" />
+		</audio>
+		<audio id="click">
+			<source src="sfx/click.ogg" type="audio/mp3" />
+		</audio>
+		<audio id="applause">
+			<source src="sfx/applause.mp3" type="audio/mp3" />
+		</audio>
+		<audio id="boos">
+			<source src="sfx/crowdboo.mp3" type="audio/mp3" />
+		</audio>
+		<script src="js/question.js"></script>
+	</body>
 </html>
-
-
-
-
