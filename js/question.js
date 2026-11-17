@@ -1,184 +1,191 @@
-'use strict';
+import { createCompletedResult, isValidActiveQuiz } from './quiz-core.js';
+import { createQuizStore } from './quiz-store.js';
 
-const storedQuestions = JSON.parse(localStorage.getItem("questions"))
-const musicTime = JSON.parse(localStorage.getItem("musicTime"))
-const musicPause = JSON.parse(localStorage.getItem('paused'))
-const questionAsked = document.getElementById('question')
-let questionIterator = 0;
-const submitQsButton = document.getElementById('btnSubmit')
-const nextQsButton = document.getElementById('btnNext')
-const answerButtons = document.querySelectorAll('#btn')
-let answerSelected = false;
-console.log(musicPause['0'])
+function startQuiz() {
+	const questionTitle = document.getElementById('question');
+	const questionCount = document.getElementById('counterSpan');
+	const topic = document.getElementById('quizTopic');
+	const answers = Array.from(document.querySelectorAll('.answer-button'));
+	const progressBar = document.querySelector('[role="progressbar"]');
+	const progressFill = document.getElementById('progressFill');
+	const feedback = document.getElementById('result');
+	const checkButton = document.getElementById('btnSubmit');
+	const nextButton = document.getElementById('btnNext');
 
-const updateCounter = () => {
-    const counterDiv = document.getElementById('counter');
-    const counterSpan = document.getElementById('counterSpan');
-    counterSpan.classList = ("counterSpan");
-    counterSpan.innerHTML  = `Question ${questionIterator}/${storedQuestions.length}`;
-    }
+	let store;
+	let quiz;
+	try {
+		store = createQuizStore(localStorage);
+		quiz = store.load().activeQuiz;
+	} catch {
+		feedback.textContent = 'Saved round data could not be read. Return to setup to recover it.';
+		feedback.className = 'answer-feedback is-error';
+		checkButton.disabled = true;
+		nextButton.disabled = true;
+		return;
+	}
 
-const updateButtons = () => {
-    const answerButtons = document.querySelectorAll('#btn')
-    console.log(storedQuestions)
-    questionAsked.innerHTML= (storedQuestions[questionIterator].question)
+	if (!isValidActiveQuiz(quiz)) {
+		window.location.replace('selection.html');
+		return;
+	}
 
-    function getRandomInt(max) {
-        return Math.floor(Math.random() * Math.floor(max));
-    }
-    const setButtonVal = () => {
-        let answer = getRandomInt(4)
-        let j = 0;
-        for (let i = 0; i < answerButtons.length; i++){
-            if (i === answer){
-                answerButtons[i].innerHTML = storedQuestions[questionIterator].correct_answer
-            }
-            else{
-                answerButtons[i].innerHTML = storedQuestions[questionIterator].incorrect_answers[j]
-                j++
-            }
-        }
-    }
-    setButtonVal()
-};
-const clickSound1= document.getElementById("click");
-function playClick() {
-    clickSound1.play();
+	topic.textContent = quiz.settings.category || 'YOUR QUIZ';
+
+	function decodeHtml(value) {
+		return new DOMParser().parseFromString(value, 'text/html').documentElement.textContent || value;
+	}
+
+	function shuffle(items) {
+		for (let index = items.length - 1; index > 0; index -= 1) {
+			const randomIndex = Math.floor(Math.random() * (index + 1));
+			[items[index], items[randomIndex]] = [items[randomIndex], items[index]];
+		}
+		return items;
+	}
+
+	function saveProgress(nextQuiz) {
+		try {
+			store.saveActive(nextQuiz);
+			quiz = nextQuiz;
+			return true;
+		} catch {
+			feedback.textContent = 'Progress could not be saved. Check browser storage and try again.';
+			feedback.className = 'answer-feedback is-error';
+			return false;
+		}
+	}
+
+	function updateProgress() {
+		const completed = quiz.answers.filter((answer) => typeof answer === 'string').length;
+		const percent = Math.round((completed / quiz.questions.length) * 100);
+		progressBar.setAttribute('aria-valuenow', String(percent));
+		progressFill.style.width = `${percent}%`;
+		questionCount.textContent = `Question ${quiz.currentIndex + 1} of ${quiz.questions.length}`;
+	}
+
+	function showQuestion() {
+		const question = quiz.questions[quiz.currentIndex];
+		if (!question) {
+			feedback.textContent = 'This question could not be displayed. Return to setup to start another round.';
+			feedback.className = 'answer-feedback is-error';
+			checkButton.disabled = true;
+			nextButton.hidden = true;
+			return;
+		}
+
+		questionTitle.textContent = decodeHtml(question.question);
+		feedback.textContent = '';
+		feedback.className = 'answer-feedback';
+		checkButton.hidden = quiz.answered;
+		checkButton.disabled = false;
+		nextButton.hidden = !quiz.answered;
+		nextButton.disabled = false;
+		nextButton.textContent = quiz.currentIndex === quiz.questions.length - 1
+			? 'See results'
+			: 'Next question →';
+
+		const correctAnswer = decodeHtml(question.correct_answer);
+		const choices = shuffle([
+			correctAnswer,
+			...question.incorrect_answers.map(decodeHtml),
+		]);
+		answers.forEach((button, index) => {
+			button.textContent = choices[index];
+			button.dataset.answer = choices[index];
+			button.disabled = quiz.answered;
+			button.className = 'answer-button';
+			button.setAttribute('aria-pressed', String(choices[index] === quiz.selectedAnswer));
+
+			if (quiz.answered && choices[index] === correctAnswer) {
+				button.classList.add('is-correct');
+			} else if (quiz.answered && choices[index] === quiz.selectedAnswer) {
+				button.classList.add('is-incorrect');
+			}
+		});
+
+		if (quiz.answered) {
+			const isCorrect = quiz.selectedAnswer === correctAnswer;
+			feedback.textContent = isCorrect
+				? 'Correct. Well done.'
+				: `Not quite. The correct answer is ${correctAnswer}.`;
+			feedback.className = `answer-feedback ${isCorrect ? 'is-correct' : 'is-incorrect'}`;
+		}
+		updateProgress();
+	}
+
+	answers.forEach((button) => {
+		button.addEventListener('click', () => {
+			if (quiz.answered) {
+				return;
+			}
+			const nextQuiz = { ...quiz, selectedAnswer: button.dataset.answer };
+			quiz = nextQuiz;
+			answers.forEach((answerButton) => {
+				answerButton.setAttribute('aria-pressed', String(answerButton === button));
+			});
+			feedback.textContent = '';
+			feedback.className = 'answer-feedback';
+			saveProgress(nextQuiz);
+		});
+	});
+
+	checkButton.addEventListener('click', () => {
+		if (quiz.answered) {
+			return;
+		}
+		if (quiz.selectedAnswer === null) {
+			feedback.textContent = 'Select an answer before checking.';
+			feedback.className = 'answer-feedback is-error';
+			return;
+		}
+
+		const answerHistory = quiz.answers.slice();
+		answerHistory[quiz.currentIndex] = quiz.selectedAnswer;
+		const nextQuiz = {
+			...quiz,
+			answers: answerHistory,
+			answered: true,
+		};
+		if (saveProgress(nextQuiz)) {
+			showQuestion();
+		}
+	});
+
+	nextButton.addEventListener('click', () => {
+		if (!quiz.answered) {
+			return;
+		}
+		if (quiz.currentIndex === quiz.questions.length - 1) {
+			nextButton.disabled = true;
+			try {
+				const result = createCompletedResult(
+					quiz,
+					new Date().toISOString(),
+					decodeHtml,
+				);
+				store.complete(result);
+				window.location.assign('results.html');
+			} catch {
+				nextButton.disabled = false;
+				feedback.textContent = 'Results could not be saved. Check browser storage and try again.';
+				feedback.className = 'answer-feedback is-error';
+			}
+			return;
+		}
+
+		const nextQuiz = {
+			...quiz,
+			currentIndex: quiz.currentIndex + 1,
+			selectedAnswer: null,
+			answered: false,
+		};
+		if (saveProgress(nextQuiz)) {
+			showQuestion();
+		}
+	});
+
+	showQuestion();
 }
-const appSound2= document.getElementById("applause");
-function appPlay() {
-    appSound2.play();
-}
-function appStop() {
-    appSound2.pause();
-}
-const booSound2= document.getElementById("boos");
-function booPlay() {
-    booSound2.play();
-}
-function booStop() {
-    booSound2.pause();
-}
-const myMusic= document.getElementById("music");
-function play() {
-    myMusic.play();
-}
 
-function pause() {
-    myMusic.pause();
-}
-
-console.log(myMusic.autoplay)
-
-if(musicPause['0'] === 'play'){
-    myMusic.autoplay = true;
-    myMusic.load()
-    myMusic.play()
-    console.log(myMusic.autoplay)
-}
-
-document.addEventListener('DOMContentLoaded', ()=>{
-    updateButtons();
-    questionIterator = 1;
-    nextQsButton.style.display = "none"
-    updateCounter();
-})
-
-nextQsButton.addEventListener('click', (e)=>{
-    e.preventDefault();
-    if (questionIterator === storedQuestions.length){
-        localStorage.setItem("correctCounter", JSON.stringify(correctCounter))
-        localStorage.setItem('answerArr', JSON.stringify(answerArr))
-        // correctCounter = 0
-        // answerArr =[]
-        playClick()
-        let nextPage = setTimeout(function(){window.location.replace('results.html')},1000)
-    }
-    else{playClick()
-    buttonNeutral();
-    updateButtons();
-    questionIterator++;
-    updateCounter();
-    submitQsButton.style.display = "block"
-    nextQsButton.style.display = "none"
-    answerSelected = false}
-});
-
-
-(function (){
-    answerButtons.forEach(btn=>{
-        btn.addEventListener('click', e=>{
-            playClick()
-            const removeAll = () =>{
-                answerButtons.forEach(button =>{
-                    button.classList.remove('selected')
-                })
-            }
-            removeAll()
-            btn.classList.toggle('selected')
-            answerSelected = true
-        })
-    })
-})();
-//I added the arr below to help with the results page
-let answerArr = [];
-let correctCounter = 0;
-submitQsButton.addEventListener('click', (e)=>{
-    const resultDisplay = document.getElementById('result')
-    playClick()
-    if (!answerSelected){
-        resultDisplay.classList.toggle('on')
-        resultDisplay.innerHTML=('Please select an answer')
-    
-    }
-    else{
-        if (resultDisplay.innerHTML === 'Please select an answer'){
-            resultDisplay.classList.toggle('on')
-        }
-        resultDisplay.classList.toggle('on')   
-        const buttonChange = () =>{
-            answerButtons.forEach(btn=>{
-                if (btn.classList.contains("selected")){
-                    answerArr[questionIterator-1] = btn.innerHTML
-                    if (answerArr[questionIterator-1] === storedQuestions[questionIterator-1].correct_answer){
-                        resultDisplay.innerHTML = "CORRECT!!!"
-                        appPlay();
-                        correctCounter += 1
-                        }
-                    else {
-                        resultDisplay.innerHTML = "INCORRECT!!!"
-                        booPlay();
-                    }
-                }
-
-                if (btn.innerHTML === storedQuestions[questionIterator-1].correct_answer){
-                    btn.classList.toggle('correct')
-                }
-                else {
-                    btn.classList.toggle('incorrect')
-                }
-                console.log("correct counter", correctCounter)
-            })
-        }
-    
-        buttonChange()
-    
-    if (questionIterator === storedQuestions.length){
-        nextQsButton.innerHTML = "Results"  
-    } 
-    nextQsButton.style.display = "block"
-    submitQsButton.style.display = "none"}
-})
-
-const buttonNeutral = () =>{
-    const answerButtons = document.querySelectorAll('#btn')
-    const resultDisplay = document.getElementById('result')
-    answerButtons.forEach(btn=>{
-        btn.classList.remove('correct')
-        btn.classList.remove('incorrect')
-        btn.classList.remove('selected')
-    })
-    resultDisplay.classList.toggle('on')
-    appStop()
-    booStop()
-}
+startQuiz();

@@ -1,176 +1,183 @@
-'use strict';
-let categoryType = 10;
-let questionNumber = 10;
-let questionDifficulty = 'medium';
-const token = JSON.parse(localStorage.getItem('token'))
-const myMusic= document.getElementById("music");
+import { get } from './get.js';
+import { createActiveQuiz, isValidQuestions } from './quiz-core.js';
+import { createQuizStore } from './quiz-store.js';
 
+const selectionForm = document.getElementById('selection-menu');
+const categorySelect = document.getElementById('category');
+const categoryOptions = document.getElementById('topicOptions');
+const questionCountSelect = document.getElementById('questionNum');
+const setupStatus = document.getElementById('setupStatus');
+const submitButton = document.getElementById('submitForm');
+const existingRound = document.getElementById('existingRound');
+const savedRoundDetail = document.getElementById('savedRoundDetail');
+const clearSavedDataButton = document.getElementById('clearSavedData');
 
-function toggle() {
-    const image = document.getElementById("toggle");
-    if (image.className === "play") {
-        image.className = "pause"
-        image.src = "images/play.png";
-        myMusic.pause();
-    } else {
-        image.className = "play"
-        image.src = "images/pause.png";
-        myMusic.play();
-    }
+let store;
+let storageError = false;
+
+function showStatus(message, isError = false) {
+	setupStatus.textContent = message;
+	setupStatus.classList.toggle('is-error', isError);
 }
 
-const clickSound = document.getElementById("click");
-function playClick() {
-    clickSound.play();
+function describeRound(quiz) {
+	const answered = quiz.answers.filter((answer) => typeof answer === 'string').length;
+	return `${quiz.settings.category} · ${answered} of ${quiz.questions.length} answered`;
 }
 
-document.addEventListener('DOMContentLoaded', () =>{
-    
-    localStorage.removeItem('questions')
-    localStorage.removeItem('correctCounter')
-    const questionNum = document.getElementById('questionNum')
-    myMusic.autoplay = true;
-    if(myMusic.autoplay){
-        myMusic.load()
-        console.log(myMusic.autoplay)
-    }
-        
-    const getQuestionDifficulty = () => {
-        const questionDiff = document.getElementById('difficulty')
-        const arrDiff = ["Easy", "Medium", "Hard"]
-        arrDiff.map(function(diff){
-            const diffOption = document.createElement('option');
-            questionDiff.appendChild(diffOption);
-            diffOption.value = diff;
-            diffOption.text = diff;
-        })
-    }
-    getQuestionDifficulty()
-    const getCategories = () => {
-        const url = `https://opentdb.com/api_category.php`;
-        const categorySelect = document.getElementById('category')
-        get(url).then(function(categories){
-            const arr = categories.trivia_categories
-            arr.map(function(category){
-                const categoryOption = document.createElement('option')
-                categorySelect.appendChild(categoryOption)
-                categoryOption.value = category.id;
-                categoryOption.text = category.name;
-            })
-        })
-    }
-    getCategories()
-    const getFifteen = () => {
-        for (let i=1; i < 16; i++){
-            const numOption = document.createElement('option')
-            numOption.value = i.toString();
-            numOption.text = i.toString();
-            questionNum.appendChild(numOption);
-        }
-    }
-    getFifteen()
-})
-const form = document.getElementById('selection-menu')
-const numForm = document.getElementById('other-form')
-numForm.addEventListener('change',event=>{
-    event.preventDefault()
-    console.log(event.target.id)
-    console.log(document.querySelectorAll('.required').length > 0)
-    if (event.target.id === 'questionNum' && document.querySelectorAll('.required').length > 0){
-        console.log('happened')
-        document.getElementById('required').remove()
-        
-    }
-})
-form.addEventListener('change', event => {
-    console.log(event.target.id)
-    event.preventDefault()
-    let url = '';
-    if (event.target.id !== 'questionNum') {
-    const getQuestionNum = () => {
-        const categorySelect = document.getElementById('category')
-        const questionDiff = document.getElementById('difficulty')
-        const questionNum = document.getElementById('questionNum')
-        questionNum.innerHTML="Select number"
-        if (categorySelect.value===""){
-            for (let i=1; i <= 16; i++){
-                const numOption = document.createElement('option')
-                numOption.value = i.toString();
-                numOption.text = i.toString();
-                questionNum.appendChild(numOption);
-            }
-            return 0;
-        }
-        else{
-            url = `https://opentdb.com/api_count.php?category=${categorySelect.value}`
-        }
-        console.log('category URL', url)
-        console.log(url)
-        
+try {
+	store = createQuizStore(localStorage);
+	const { activeQuiz } = store.load();
+	if (activeQuiz) {
+		existingRound.hidden = false;
+		savedRoundDetail.textContent = describeRound(activeQuiz);
+	}
+} catch {
+	storageError = true;
+	showStatus(
+		store
+			? 'Saved data could not be read. Clear it below to start a new round.'
+			: 'Browser storage is unavailable. Enable storage to start a round.',
+		true,
+	);
+	clearSavedDataButton.hidden = !store;
+	submitButton.disabled = true;
+}
 
-        let maxTotal = 0;
-        get(url).then(function(categoryQCount){
-            // const arr = categoryQCount.category_question_count
-            if (questionDiff.value === ""){
-                maxTotal = categoryQCount.category_question_count.total_question_count
-                if(maxTotal>=16){maxTotal = 15}
-                for (let i=1; i <= maxTotal; i++){
-                    const numOption = document.createElement('option')
-                    numOption.value = i.toString();
-                    numOption.text = i.toString();
-                    questionNum.appendChild(numOption);
-                }
-            } 
-            else {      
-                maxTotal = categoryQCount.category_question_count[`total_${questionDiff.value.toLowerCase()}_question_count`]
-                if(maxTotal>=16){maxTotal = 15}
-                for (let i=1; i <= maxTotal; i++){
-                    const numOption = document.createElement('option')
-                    numOption.value = i.toString();
-                    numOption.text = i.toString();
-                    questionNum.appendChild(numOption);
-                }
-            }
-        console.log(categoryQCount.category_question_count[`total_${questionDiff.value.toLowerCase()}_question_count`])
-        console.log(maxTotal)
-        })
-        console.log(maxTotal)
-
-    }
-    getQuestionNum()}
-})
-const submitButton = document.querySelector('#submitForm')
-submitButton.addEventListener('click', e =>{
-    const categorySelect = document.getElementById('category')
-    const questionDiff = document.getElementById('difficulty')
-    const questionNum = document.getElementById('questionNum')
-    let questionsArr = [];
-    console.log(questionNum.value)
-    if (questionNum.value === ""){
-        if(document.querySelectorAll('.required').length > 0)
-        {
-            document.getElementById('required').remove()
-        }
-        
-        const errorMessage = document.createElement('p')
-        const numQuestions = document.getElementById('numQuestions')
-        numQuestions.appendChild(errorMessage)
-        errorMessage.innerHTML = '*required'
-        errorMessage.classList.toggle('required')
-        errorMessage.id = 'required'
-    }
-    else{
-        const url = `https://opentdb.com/api.php?amount=${questionNum.value}&category=${categorySelect.value}&difficulty=${questionDiff.value.toLowerCase()}&type=multiple`
-        console.log(url)
-        get(url).then(questions =>{
-            
-            questionsArr = questions.results
-            localStorage.setItem("questions", JSON.stringify(questionsArr))
-            const image = document.getElementById("toggle");
-            localStorage.setItem('paused',JSON.stringify(image.classList))
-            playClick()
-            let nextPage = setTimeout(function(){window.location.replace('gamescreen.html')},1000)
-            // window.location.replace('gamescreen.html')
-        })
-    }
+clearSavedDataButton.addEventListener('click', () => {
+	if (!store || !window.confirm('Clear saved quiz history and progress from this browser?')) {
+		return;
+	}
+	try {
+		store.reset();
+		storageError = false;
+		existingRound.hidden = true;
+		clearSavedDataButton.hidden = true;
+		submitButton.disabled = false;
+		showStatus('Saved data cleared. Choose your round settings.');
+	} catch {
+		showStatus('Browser storage is unavailable. Saved data could not be cleared.', true);
+	}
 });
+
+async function loadCategories() {
+	try {
+		const data = await get('https://opentdb.com/api_category.php');
+		if (!Array.isArray(data.trivia_categories) || data.trivia_categories.length === 0) {
+			throw new Error('The topic list was not available.');
+		}
+
+		const categories = data.trivia_categories.filter((category) => (
+			Number.isInteger(category.id) && typeof category.name === 'string'
+		));
+		if (categories.length === 0) {
+			throw new Error('The topic list was not available.');
+		}
+
+		const selectedCategory = categorySelect.value;
+		const options = document.createDocumentFragment();
+		categories.forEach((category) => {
+			const option = document.createElement('option');
+			option.value = String(category.id);
+			option.textContent = category.name;
+			options.appendChild(option);
+		});
+		categoryOptions.replaceChildren(options);
+		if (categories.some((category) => String(category.id) === selectedCategory)) {
+			categorySelect.value = selectedCategory;
+		}
+		if (!storageError) {
+			showStatus('Topics are ready. Any topic is also an option.');
+		}
+	} catch {
+		if (!storageError) {
+			showStatus('Topic service unavailable. Built-in topics remain available; starting a round still needs a connection.', true);
+		}
+	}
+}
+
+selectionForm.addEventListener('submit', async (event) => {
+	event.preventDefault();
+	if (storageError || !selectionForm.reportValidity()) {
+		return;
+	}
+
+	const amount = Number(questionCountSelect.value);
+	if (!Number.isInteger(amount) || amount < 1 || amount > 15) {
+		showStatus('Choose a question count between 1 and 15.', true);
+		return;
+	}
+
+	try {
+		if (store.load().activeQuiz && !window.confirm('Starting a new round will replace the unfinished one. Continue?')) {
+			return;
+		}
+	} catch {
+		storageError = true;
+		showStatus('Saved data could not be read. Clear it below to start a new round.', true);
+		clearSavedDataButton.hidden = false;
+		submitButton.disabled = true;
+		return;
+	}
+
+	const parameters = new URLSearchParams({
+		amount: String(amount),
+		type: 'multiple',
+	});
+	if (categorySelect.value) {
+		parameters.set('category', categorySelect.value);
+	}
+	const difficulty = document.getElementById('difficulty').value;
+	if (difficulty) {
+		parameters.set('difficulty', difficulty);
+	}
+
+	submitButton.disabled = true;
+	showStatus('Preparing your quiz…');
+	try {
+		const data = await get(`https://opentdb.com/api.php?${parameters.toString()}`);
+		if (data.response_code !== 0 || !Array.isArray(data.results)) {
+			const messages = {
+				1: 'There are not enough questions for these settings. Try a different topic or a shorter round.',
+				2: 'Those quiz settings were not accepted. Please adjust them and try again.',
+				5: 'The question service is busy. Wait a few seconds and try again.',
+			};
+			showStatus(messages[data.response_code] || 'Questions are unavailable right now. Please try again.', true);
+			return;
+		}
+		if (data.results.length !== amount || !isValidQuestions(data.results)) {
+			showStatus('The question service returned an incomplete or invalid round. Please try again.', true);
+			return;
+		}
+
+		const settings = {
+			category: categorySelect.selectedOptions[0].textContent,
+			difficulty: difficulty || 'Any difficulty',
+		};
+		const id = globalThis.crypto?.randomUUID
+			? globalThis.crypto.randomUUID()
+			: `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+		const activeQuiz = createActiveQuiz({
+			id,
+			startedAt: new Date().toISOString(),
+			questions: data.results,
+			settings,
+		});
+		try {
+			store.saveActive(activeQuiz);
+			window.location.assign('gamescreen.html');
+		} catch {
+			showStatus('Your browser could not save this round. Check storage settings and try again.', true);
+		}
+	} catch (error) {
+		const message = error.name === 'AbortError'
+			? 'The question service took too long to respond. Please try again.'
+			: 'Could not connect to the question service. Check your connection and try again.';
+		showStatus(message, true);
+	} finally {
+		submitButton.disabled = false;
+	}
+});
+
+loadCategories();
+window.gecomtechSetupReady = true;

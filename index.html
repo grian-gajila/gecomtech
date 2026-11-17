@@ -1,56 +1,51 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Gecomtech</title>
-		<link
-			href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@700&display=swap"
-			rel="stylesheet"
+		<meta name="theme-color" content="#f5f4ef" />
+		<meta
+			name="description"
+			content="Build your knowledge with a focused, customizable trivia quiz."
 		/>
-		<link
-			href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300&display=swap"
-			rel="stylesheet"
-		/>
-		<link
-			rel="stylesheet"
-			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
-			integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog=="
-			crossorigin="anonymous"
-		/>
-		<link rel="icon" href="images/CpeDev.png" />
+		<title>Gecomtech | Quiz Game</title>
 		<link rel="stylesheet" href="css/index.css" />
-		<link rel="stylesheet" href="css/help.css" />
 	</head>
-
-	<body>
-		<div class="wrapper">
-			<main class="main">
-				<div>
-					<img src="images/school.png" class="school-logo" />
+	<body class="home-page">
+		<header class="site-header home-header">
+			<a class="brand" href="index.html" aria-label="Gecomtech home">
+				<span class="brand-mark" aria-hidden="true">G</span>
+				<span>GECOMTECH <span class="brand-divider">/</span> TRIVIA</span>
+			</a>
+		</header>
+		<main class="home-layout">
+			<section class="home-story" aria-labelledby="home-title">
+				<p class="eyebrow">GECOMTECH · TRIVIA</p>
+				<h1 id="home-title">A focused test of what you know.</h1>
+				<p class="home-description">
+					Set the subject. Choose the difficulty. Work through each question at
+					your own pace.
+				</p>
+				<a class="primary-button home-start" href="selection.html">
+					Configure a round <span aria-hidden="true">&rarr;</span>
+				</a>
+			</section>
+			<aside class="home-rail" aria-labelledby="activityTitle">
+				<p class="rail-heading" id="activityTitle">YOUR ACTIVITY</p>
+				<p class="activity-summary" id="activitySummary" role="status" aria-live="polite">
+					Loading your saved rounds…
+				</p>
+				<div class="in-progress" id="resumeRound" hidden>
+					<p class="resume-label">ROUND IN PROGRESS</p>
+					<p id="resumeDetail" class="resume-detail"></p>
+					<a class="resume-link" href="gamescreen.html">
+						Resume round <span aria-hidden="true">&rarr;</span>
+					</a>
 				</div>
-				<div class="hero-image">
-					<img src="images/title.png" class="entry-logo" />
-				</div>
-				<a class="lets-begin" id="beginBTN" href="selection.html"
-					>Let's Start</a
-				>
-			</main>
-		</div>
-		<footer class="footer">
-			<ul style="margin-bottom: 30px" class="links">
-				<li>
-					<a
-						class="active"
-						href="https://github.com/g-r-i-a-n/gecomtech/blob/main/README.md"
-						>Help?</a
-					>
-				</li>
-			</ul>
-			<audio id="click">
-				<source src="sfx/click.ogg" type="audio/mp3" />
-			</audio>
-		</footer>
-		<script src="js/entry.js"></script>
+				<ol class="recent-list" id="recentRounds" aria-label="Recent completed rounds"></ol>
+				<p class="rail-note">Your round history is saved in this browser.</p>
+			</aside>
+		</main>
+		<script type="module" src="js/dashboard.js"></script>
 	</body>
 </html>

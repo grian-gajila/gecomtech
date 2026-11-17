@@ -1,71 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="theme-color" content="#f5f4ef" />
+		<title>Build your quiz | Gecomtech</title>
+		<link rel="stylesheet" href="css/index.css" />
+	</head>
+	<body>
+		<header class="site-header">
+			<a class="brand" href="index.html" aria-label="Gecomtech home">
+				<span class="brand-mark" aria-hidden="true">G</span>
+				<span>GECOMTECH <span class="brand-divider">/</span> TRIVIA</span>
+			</a>
+			<a class="text-link" href="index.html">Home</a>
+		</header>
+		<main class="setup-layout">
+			<section class="setup-intro" aria-labelledby="setup-title">
+				<p class="section-kicker">01 / SETUP</p>
+				<h1 id="setup-title">Set the terms of this round.</h1>
+				<p class="section-description">
+					Choose a subject, decide how challenging it should be, and set a length that fits your time.
+				</p>
+				<p class="intro-footnote">Your answers and score stay in this browser.</p>
+			</section>
+			<section class="setup-panel" aria-label="Round parameters">
+				<div class="panel-heading">
+					<p class="rail-heading">ROUND PARAMETERS</p>
+					<span>01—03</span>
+				</div>
+				<div class="existing-round" id="existingRound" hidden>
+					<p class="resume-label">ROUND IN PROGRESS</p>
+					<p id="savedRoundDetail" class="resume-detail"></p>
+					<a class="resume-link" href="gamescreen.html">
+						Resume this round <span aria-hidden="true">&rarr;</span>
+					</a>
+				</div>
+				<form id="selection-menu" class="setup-form">
+					<div class="field-grid">
+						<div class="form-field form-field-wide">
+							<label for="category">Topic</label>
+							<select id="category" name="category">
+								<option value="">Any topic</option>
+								<optgroup label="Available topics" id="topicOptions">
+									<option value="9">General Knowledge</option>
+									<option value="10">Entertainment: Books</option>
+									<option value="11">Entertainment: Film</option>
+									<option value="12">Entertainment: Music</option>
+									<option value="13">Entertainment: Musicals &amp; Theatres</option>
+									<option value="14">Entertainment: Television</option>
+									<option value="15">Entertainment: Video Games</option>
+									<option value="16">Entertainment: Board Games</option>
+									<option value="17">Science &amp; Nature</option>
+									<option value="18">Science: Computers</option>
+									<option value="19">Science: Mathematics</option>
+									<option value="20">Mythology</option>
+									<option value="21">Sports</option>
+									<option value="22">Geography</option>
+									<option value="23">History</option>
+									<option value="24">Politics</option>
+									<option value="25">Art</option>
+									<option value="26">Celebrities</option>
+									<option value="27">Animals</option>
+									<option value="28">Vehicles</option>
+									<option value="29">Entertainment: Comics</option>
+									<option value="30">Science: Gadgets</option>
+									<option value="31">Entertainment: Japanese Anime &amp; Manga</option>
+									<option value="32">Entertainment: Cartoon &amp; Animations</option>
+								</optgroup>
+							</select>
+						</div>
+						<div class="form-field">
+							<label for="difficulty">Difficulty</label>
+							<select id="difficulty" name="difficulty">
+								<option value="">Any difficulty</option>
+								<option value="easy">Easy</option>
+								<option value="medium">Medium</option>
+								<option value="hard">Hard</option>
+							</select>
+						</div>
+						<div class="form-field">
+							<label for="questionNum">Round length</label>
+							<select id="questionNum" name="amount" required>
+								<option value="">Choose count</option>
+								<option value="5">5 questions</option>
+								<option value="10">10 questions</option>
+								<option value="15">15 questions</option>
+							</select>
+						</div>
+					</div>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gecomtech</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500&display=swap" rel="stylesheet">
-    <link rel="icon" href="images/CpeDev.png">
-    <link rel="stylesheet" href="css/index.css">
-    <link rel="stylesheet" href="css/help.css">
-    
-</head>
-<body>
-    <header class="header">
-        <a href="index.html" class="active back-selection">Back to Home  <img class="handarrow" src="images/handarrow.png"></a>
-    </header>
-    <div class="wrapper">
-        <main class="selection-wrapper">
-            <img src="images/title.png" class="selection-logo">
-            <div class="selection">
-                <h1 class="selection-menu-header"></h1>
-                <form id="selection-menu" class="selection-menu">
-                    <label>
-                        <p class="text-pad">Topic:</p>
-                        <select id="category" class="category" value="category">
-                            <option value="">Choose Topic</option>
-                        </select>
-                    </label>
-                    <label>
-                        <p class="text-pad">Difficulty Level:</p>
-                        <select id="difficulty" class="difficulty">
-                            <option value = "">Choose Difficulty</option>
-                        </select>
-                    </label>
-                    
-                </form>
-                <form id= "other-form">
-                    <label>
-                        <!-- <p class="text-pad">Number of Questions:</p>
-                    <label > -->
-                        <p id="numQuestions" class="text-pad">How Many Questions?</p>
-                        <select id="questionNum" class="questionNum"> 
-                            <option value="" required>Choose number of question</option>
-                        </select>
-                    </label>
-                </form>
-            </div>
-            <div id='submitForm' class="play-game">
-                PLAY!
-            </div>
-            </form>
-                <audio  id="music">
-                    <source src="sfx/frontmusic.mp3" type="audio/mp3">
-                </audio>
-                <audio  id="click">
-                    <source src="sfx/click.ogg" type="audio/ogg">
-                </audio>
-                <img id="toggle" class="play" onclick="toggle()" src="images/pause.png">   
-                <section class="copyright">
-                    <p > <a href="https://github.com/cpe-prog"> &#169; gri@n02 </a></p>
-                </section>
-        </main>
+					<p id="setupStatus" class="form-status" role="status" aria-live="polite">
+						Loading topic list…
+					</p>
+					<button class="secondary-button clear-data-button" id="clearSavedData" type="button" hidden>
+						Clear unreadable saved data
+					</button>
+					<button class="primary-button setup-submit" id="submitForm" type="submit">
+						Start quiz <span aria-hidden="true">&rarr;</span>
+					</button>
+				</form>
+				<a class="back-link" href="index.html">&larr; Home</a>
+			</section>
+		</main>
+		<script>
+			window.gecomtechSetupReady = false;
+			document.getElementById('selection-menu').addEventListener('submit', (event) => {
+				if (window.gecomtechSetupReady) {
+					return;
+				}
 
-    </div>
-</body>
-    
-<script src="js/get.js"></script>
-<script src="js/index.js"></script>    
+				event.preventDefault();
+				const setupStatus = document.getElementById('setupStatus');
+				setupStatus.textContent = window.location.protocol === 'file:'
+					? 'This local file cannot start a quiz. Open your Vercel HTTPS URL instead; no local server is needed.'
+					: 'Quiz setup did not load. Refresh the page and check that its scripts are available.';
+				setupStatus.classList.add('is-error');
+			}, true);
+		</script>
+		<script type="module" src="js/index.js"></script>
+	</body>
 </html>

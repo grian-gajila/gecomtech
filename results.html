@@ -3,69 +3,66 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Gecomtech</title>
-		<link
-			href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@700&display=swap"
-			rel="stylesheet"
-		/>
-		<link
-			href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500&display=swap"
-			rel="stylesheet"
-		/>
-		<link rel="icon" href="images/CpeDev.png" />
+		<meta name="theme-color" content="#f5f4ef" />
+		<title>Your results | Gecomtech</title>
 		<link rel="stylesheet" href="css/index.css" />
-		<link rel="stylesheet" href="css/help.css" />
+		<link rel="stylesheet" href="css/screen.css" />
 	</head>
-	<body class="body-results">
-		<main class="result-main">
-			<header class="result-header">
-				<p>
-					<img src="images/title.png" class="results-logo" />
-				</p>
-				<h1 class="result-header">Results</h1>
-			</header>
-			<section id="resultsDisplay" class="results-display">
-				<h2 class="result-header" id="result">Result</h2>
-				<p id="funny">Phrase regarding the results</p>
-				<p>
-					<a id="playAgain" class="play-again" href="selection.html"
-						>Play again?</a
-					>
-				</p>
-				<div class="more-results" id="moreResults">Details</div>
-				<div class="full-results">
-					<table id="fullResults" class="results-table">
-						<thead>
-							<th>Question</th>
-							<th>Your Answer</th>
-							<th>Correct Answer</th>
-						</thead>
-						<tbody id="tableBody"></tbody>
-					</table>
+	<body>
+		<header class="site-header">
+			<a class="brand" href="index.html">
+				<span class="brand-mark" aria-hidden="true">G</span>
+				<span>GECOMTECH <span class="brand-divider">/</span> TRIVIA</span>
+			</a>
+			<a class="text-link" href="selection.html">New quiz</a>
+		</header>
+		<main class="results-layout">
+			<section class="results-summary" aria-labelledby="resultsTitle">
+				<div class="section-kicker">ROUND COMPLETE</div>
+				<h1 id="resultsTitle">Your results</h1>
+				<p class="score-summary" id="result">Calculating your score…</p>
+				<p class="result-context" id="resultContext"></p>
+				<div class="score-meter" aria-hidden="true">
+					<div class="score-meter-fill" id="scoreMeterFill"></div>
+				</div>
+				<p class="result-message" id="funny"></p>
+				<div class="results-actions">
+					<a id="playAgain" class="primary-button" href="selection.html">Play another round</a>
 				</div>
 			</section>
-			<div class="footer" style="margin-bottom: 50px" id="footer">
-				<ul class="links">
-					<li><a class="active" href="index.html">Home</a></li>
-				</ul>
-			</div>
+			<section class="results-review" aria-labelledby="reviewTitle">
+				<div class="panel-heading">
+					<div>
+						<p class="rail-heading">ANSWER REVIEW</p>
+						<h2 id="reviewTitle">See what you learned.</h2>
+					</div>
+					<button
+						class="secondary-button"
+						id="moreResults"
+						type="button"
+						aria-expanded="false"
+						aria-controls="fullResults"
+					>
+						Review answers
+					</button>
+				</div>
+				<p class="review-description">Compare your response with the correct answer for each question.</p>
+				<div class="full-results" id="fullResults" hidden>
+					<div class="table-scroll">
+						<table class="results-table">
+							<thead>
+								<tr>
+									<th scope="col">Question</th>
+									<th scope="col">Your answer</th>
+									<th scope="col">Correct answer</th>
+								</tr>
+							</thead>
+							<tbody id="tableBody"></tbody>
+						</table>
+					</div>
+				</div>
+			</section>
 		</main>
-		<!-- <audio  id="music">
-        <source src="sfx/main-Oman.mp3" type="audio/mp3">
-    </audio> -->
-		<audio id="click">
-			<source src="sfx/click.ogg" type="audio/mp3" />
-		</audio>
-		<audio id="applause">
-			<source src="sfx/applause.mp3" type="audio/mp3" />
-		</audio>
-		<audio id="boos">
-			<source src="sfx/crowdboo.mp3" type="audio/mp3" />
-		</audio>
+		<script type="module" src="js/results.js"></script>
 	</body>
-	<script src="js/confetti.js"></script>
-	<script>
-		confetti.start();
-	</script>
-	<script src="js/results.js"></script>
 </html>

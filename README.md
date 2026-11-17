@@ -1,56 +1,34 @@
-﻿# GECOMTECH Quiz Game
+# Gecomtech Quiz
 
-* Educational Related online game with API 
-* Related Technology Questions
+A responsive, browser-based trivia app backed by the [Open Trivia Database](https://opentdb.com/).
 
+## Features
 
-#
-# How to use my quiz game application!
-* Click start for the next page of the app, which shows the selection  page
-<img src="images/first.jpg">
+- Configurable multiple-choice rounds by topic, difficulty, and length.
+- Resume an unfinished round after a reload or return to the home page.
+- Local activity summary with the average score and the 20 most recent rounds.
+- Review the question-by-question results for any saved round.
+- Versioned local storage with validation and explicit recovery for unreadable data.
 
-#
+No account or application backend is required. Quiz data remains in the current browser.
 
-* If you want the code of this app click the SourseCode in upper page and copy/download the whole code
+## Deploy to Vercel
 
+This is a static site; Vercel serves the HTML, CSS, and JavaScript over HTTPS. No backend or local server is needed after deployment.
 
-#
+1. Import this repository into Vercel.
+2. Select the **Other** framework preset and keep the project root as the root directory.
+3. Leave the build command empty and deploy the static files from the repository root.
+4. Open the HTTPS deployment URL provided by Vercel.
 
-* Here is the the selection page which you can choose topic what you want to take
-* Here is the Difficulty level of the quiz
-* here is the number of question you want to take with the available number of 1 to 15 choices
-* Click play to for the game screen
-<img src="images/second.jpg">
+Do not open `index.html` directly as a `file://` URL: browsers block module loading and cross-origin API requests from that origin. Starting a round requires an internet connection to retrieve questions from Open Trivia Database.
 
-# 
-* This show the question of what topic you choose to take
-* To take the quiz you need to read first the question before you click the answer below the question
-* Once you click the answer kindly click the check button below the answer selection and it will identify your answer if correct/wrong
-* If your answer is correct your choosen answer, you hear the crowd clap sound
-* And if your answer is wrong  you hear the looser crowd sound
-* To proceed the next question kindly click the next button
-* If you finished the quiz kind click result button to show the result page
-* If you think your choosen topic is not you think and you need to choose the new topic kindly clik the back to selection button in the upper page
-<img src="images/third.jpg">
+## Tests
 
-#
+Node.js 20 or newer is required. Run the dependency-free unit tests with:
 
-* This page show the result of the user, which show the number of your points
-<img src="images/result.jpg">
+```sh
+npm test
+```
 
-#
-
-* If you want to take other topic click play again to selection page
-* If you want to check youre quiz kindly click the details button ro show wrong answer and what is the correct answer
-<img src="images/detail.jpg">
-
-# 
-
-* If you're using laptop or desktop dont worry these are same.
-# Thank you!
-
-
-
-
-
-
+Core validation, scoring, progress persistence, completion, history retention, and invalid stored data are covered by the tests in `tests/`.
